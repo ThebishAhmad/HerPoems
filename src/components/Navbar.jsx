@@ -25,7 +25,7 @@ export default function Navbar({ theme, toggleTheme, onAddPoem, onRandomPoem, on
             <div className="header-inner">
                 <Link to="/" className="logo">
                     <span className="logo-icon">✦</span>
-                    <span className="logo-text">Inkwell</span>
+                    <span className="logo-text">The Inking</span>
                     {streak.currentStreak > 0 && (
                         <span className="streak-badge" title={`${streak.currentStreak} day streak`}>
                             🔥 {streak.currentStreak}

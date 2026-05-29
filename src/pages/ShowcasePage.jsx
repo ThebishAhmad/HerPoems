@@ -39,10 +39,10 @@ export default function ShowcasePage() {
                 {/* Footer */}
                 <footer className="showcase-footer" id="contact">
                     <p className="showcase-footer-credit">
-                        Inkwell — A Poetry Experience
+                        The Inking — A Poetry Experience
                     </p>
                     <p className="showcase-footer-sub">
-                        Crafted by Tabish Ahmad · <a href="/">Enter the Inkwell →</a>
+                        Crafted by Tabish Ahmad · <a href="/">Enter The Inking →</a>
                     </p>
                 </footer>
             </div>

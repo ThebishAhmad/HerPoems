@@ -19,7 +19,7 @@ class ErrorBoundary extends React.Component {
         if (this.state.hasError) {
             return (
                 <div style={{ padding: '2rem', color: '#ff4d4d', background: '#1a1a1a', fontFamily: 'monospace', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                    <h2 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Inkwell Crashed</h2>
+                    <h2 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>The Inking Crashed</h2>
                     <p style={{ color: '#ccc', marginBottom: '1.5rem' }}>An unexpected error occurred. Please refresh or try again.</p>
                     <pre style={{ background: '#2b2b2b', padding: '1rem', borderRadius: '4px', maxWidth: '90%', overflowX: 'auto' }}>
                         {this.state.error && this.state.error.toString()}

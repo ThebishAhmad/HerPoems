@@ -49,7 +49,7 @@ export default function Auth() {
                 >
                     <div className="logo" style={{ marginBottom: 'var(--space-xl)', fontSize: 'var(--font-size-2xl)' }}>
                         <span className="logo-icon">✦</span>
-                        <span className="logo-text">Inkwell</span>
+                        <span className="logo-text">The Inking</span>
                     </div>
 
                     <h2 className="hero-title" style={{ fontSize: 'var(--font-size-2xl)', marginBottom: 'var(--space-sm)' }}>

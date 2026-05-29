@@ -15,8 +15,8 @@ export default function ShowcaseNavbar() {
             className={`showcase-navbar${scrolled ? ' scrolled' : ''}`}
             role="banner"
         >
-            <Link to="/" className="showcase-nav-mark" aria-label="Back to Inkwell">
-                ✦ <span>INKWELL</span>
+            <Link to="/" className="showcase-nav-mark" aria-label="Back to The Inking">
+                ✦ <span>THE INKING</span>
             </Link>
 
             <a
