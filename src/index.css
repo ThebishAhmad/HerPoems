@@ -303,6 +303,8 @@ select {
     letter-spacing: -0.02em;
     transition: opacity var(--duration-fast);
     cursor: pointer;
+    white-space: nowrap;
+    flex-wrap: nowrap;
 }
 
 .logo:hover {
@@ -1480,13 +1482,19 @@ select {
 }
 
 .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     font-size: var(--font-size-xs);
-    padding: 2px 8px;
+    padding: 4px 8px;
     background: linear-gradient(135deg, rgba(255, 120, 50, 0.15), rgba(255, 80, 30, 0.08));
     border-radius: var(--radius-xl);
     font-family: var(--font-sans);
     font-weight: 600;
     color: var(--accent);
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .late-night-btn .late-night-icon {
