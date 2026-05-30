@@ -74,7 +74,11 @@ export function usePoems(uid) {
                 const { data, error } = await supabase.from('poems').select('*')
                 if (error) throw error
                 if (data) {
-                    setPoems(data)
+                    const mappedData = data.map(p => ({
+                        ...p,
+                        createdAt: p.createdAt || (p.created_at ? new Date(p.created_at).getTime() : Date.now())
+                    }))
+                    setPoems(mappedData)
                 }
             } catch (err) {
                 console.error('Failed to fetch poems:', err)
@@ -183,6 +187,7 @@ export function usePoems(uid) {
             scheduledAt,
             readingTime: estimateReadingTime(content),
             versions: [{ content, title, subtitle, timestamp: Date.now() }],
+            createdAt: Date.now(),
             updatedAt: Date.now(),
             user_id: uid,
         }
