@@ -381,9 +381,13 @@ export function usePoems(uid) {
     const addComment = useCallback(async (poemId, name, text) => {
         const comment = { id: generateId(), poemId, name, text, timestamp: Date.now() }
         try {
-            await supabase.from('comments').insert(comment)
+            const { error } = await supabase.from('comments').insert(comment)
+            if (error) throw error
         } catch (err) {
-            console.error('Failed to add comment:', err)
+            console.error('Failed to save comment to Supabase, saving locally:', err)
+            const raw = localStorage.getItem('inkwell_comments')
+            const local = raw ? JSON.parse(raw) : []
+            localStorage.setItem('inkwell_comments', JSON.stringify([comment, ...local]))
         }
         return comment
     }, [])
@@ -392,10 +396,19 @@ export function usePoems(uid) {
         try {
             const { data, error } = await supabase.from('comments').select('*').eq('poemId', poemId).order('timestamp', { ascending: false })
             if (error) throw error
-            return data || []
+            
+            const raw = localStorage.getItem('inkwell_comments')
+            const local = raw ? JSON.parse(raw) : []
+            const localForPoem = local.filter(c => c.poemId === poemId)
+            
+            const combined = [...(data || []), ...localForPoem]
+            const unique = combined.filter((c, i, a) => a.findIndex(t => t.id === c.id) === i)
+            return unique.sort((a, b) => b.timestamp - a.timestamp)
         } catch (err) {
-            console.error('Failed to fetch comments:', err)
-            return []
+            console.error('Failed to fetch comments from Supabase, returning local:', err)
+            const raw = localStorage.getItem('inkwell_comments')
+            const local = raw ? JSON.parse(raw) : []
+            return local.filter(c => c.poemId === poemId).sort((a, b) => b.timestamp - a.timestamp)
         }
     }, [])
 
@@ -403,7 +416,13 @@ export function usePoems(uid) {
         try {
             await supabase.from('comments').delete().eq('id', commentId)
         } catch (err) {
-            console.error('Failed to delete comment:', err)
+            console.error('Failed to delete comment from Supabase:', err)
+        }
+        
+        const raw = localStorage.getItem('inkwell_comments')
+        if (raw) {
+            const local = JSON.parse(raw).filter(c => c.id !== commentId)
+            localStorage.setItem('inkwell_comments', JSON.stringify(local))
         }
     }, [])
 

@@ -68,9 +68,8 @@ export default function PoemPage({
     }, [id, poem])
 
     const handleAddComment = async (poemId, name, text) => {
-        await addComment(poemId, name, text)
-        const updated = await getComments(poemId)
-        setComments(updated)
+        const newComment = await addComment(poemId, name, text)
+        setComments(prev => [newComment, ...prev])
     }
 
     const handleDeleteComment = async (poemId, commentId) => {
