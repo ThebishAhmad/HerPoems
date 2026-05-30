@@ -127,7 +127,7 @@ export function usePoems(uid) {
     const getFiltered = useCallback(() => {
         let filtered = [...poems]
 
-        filtered = filtered.filter(p => p.visibility !== 'private' && p.visibility !== 'scheduled')
+        filtered = filtered.filter(p => p.visibility !== 'private' && p.visibility !== 'scheduled' && p.visibility !== 'deleted')
 
         if (search) {
             const q = search.toLowerCase()
@@ -183,19 +183,26 @@ export function usePoems(uid) {
             scheduledAt,
             readingTime: estimateReadingTime(content),
             versions: [{ content, title, subtitle, timestamp: Date.now() }],
-            createdAt: Date.now(),
             updatedAt: Date.now(),
+            user_id: uid,
         }
         setPoems(prev => [newPoem, ...prev])
 
         try {
-            await supabase.from('poems').insert(newPoem)
+            const { error } = await supabase.from('poems').insert(newPoem)
+            if (error) {
+                console.error('Failed to save poem to Supabase:', error)
+                // Fallback local save in case of error so it doesn't disappear immediately
+                const raw = localStorage.getItem('inkwell_poems')
+                const local = raw ? JSON.parse(raw) : []
+                localStorage.setItem('inkwell_poems', JSON.stringify([newPoem, ...local]))
+            }
         } catch (err) {
-            console.error('Failed to save poem to Supabase:', err)
+            console.error('Failed to save poem:', err)
         }
 
         return newPoem
-    }, [])
+    }, [uid])
 
     const updatePoem = useCallback(async (id, title, subtitle, content, tagsStr, { visibility, mood, series, scheduledAt } = {}) => {
         let updatedPoem = null
@@ -221,10 +228,21 @@ export function usePoems(uid) {
         if (updatedPoem) {
             try {
                 const { id: _id, ...data } = updatedPoem
-                await supabase.from('poems').update(data).eq('id', id)
+                const { error } = await supabase.from('poems').update(data).eq('id', id)
+                if (error) console.error('Failed to update poem in Supabase:', error)
             } catch (err) {
-                console.error('Failed to update poem in Supabase:', err)
+                console.error('Failed to update poem:', err)
             }
+        }
+    }, [])
+
+    const softDeletePoem = useCallback(async id => {
+        setPoems(prev => prev.filter(p => p.id !== id))
+        try {
+            const { error } = await supabase.from('poems').update({ visibility: 'deleted' }).eq('id', id)
+            if (error) console.error('Failed to soft delete poem in Supabase:', error)
+        } catch (err) {
+            console.error('Failed to soft delete poem:', err)
         }
     }, [])
 
@@ -232,11 +250,12 @@ export function usePoems(uid) {
         setPoems(prev => prev.filter(p => p.id !== id))
 
         try {
-            await supabase.from('poems').delete().eq('id', id)
+            const { error: pErr } = await supabase.from('poems').delete().eq('id', id)
+            if (pErr) console.error('Failed to delete poem from Supabase:', pErr)
             // Also delete associated comments
             await supabase.from('comments').delete().eq('poemId', id)
         } catch (err) {
-            console.error('Failed to delete poem from Supabase:', err)
+            console.error('Failed to delete poem:', err)
         }
     }, [])
 
@@ -411,7 +430,7 @@ export function usePoems(uid) {
         activeMood, setActiveMood,
         getFiltered,
         allTags, allSeries,
-        addPoem, updatePoem, deletePoem,
+        addPoem, updatePoem, softDeletePoem, deletePoem,
         toggleLike, toggleReaction, getPoem, getRandomId, getLateNightPoem,
         restoreVersion, getSeriesPoems, getAdjacentPoems,
         saveScrollPosition, getScrollPosition,

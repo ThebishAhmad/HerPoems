@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 
-export default function ConfirmDialog({ isOpen, onClose, onConfirm }) {
+export default function ConfirmDialog({ isOpen, onClose, onConfirm, onSoftDelete }) {
     return (
         <AnimatePresence>
             {isOpen && (
@@ -20,11 +20,12 @@ export default function ConfirmDialog({ isOpen, onClose, onConfirm }) {
                     >
                         <h3 className="modal-heading">Delete this poem?</h3>
                         <p className="confirm-text">
-                            This action cannot be undone. The poem will be permanently removed.
+                            Do you want to permanently delete this poem, or just hide it so it's never displayed?
                         </p>
-                        <div className="confirm-actions">
-                            <button className="btn-secondary" onClick={onClose}>Keep It</button>
-                            <button className="btn-danger-solid" onClick={onConfirm}>Delete Forever</button>
+                        <div className="confirm-actions" style={{ flexDirection: 'column', gap: '8px' }}>
+                            <button className="btn-secondary" onClick={onSoftDelete} style={{ width: '100%' }}>Hide (Keep in Database)</button>
+                            <button className="btn-danger-solid" onClick={onConfirm} style={{ width: '100%' }}>Delete Forever</button>
+                            <button className="btn-ghost" onClick={onClose} style={{ width: '100%' }}>Cancel</button>
                         </div>
                     </motion.div>
                 </motion.div>

@@ -2710,7 +2710,7 @@ select {
         padding: var(--space-2xl) 0 var(--space-xl);
     }
 
-    .btn-primary span {
+    .header-actions .btn-primary span {
         display: none;
     }
 

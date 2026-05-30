@@ -130,7 +130,12 @@ function AppContent({ uid }) {
 
     const handleDelete = useCallback(id => {
         poemStore.deletePoem(id)
-        showToast('Poem deleted.')
+        showToast('Poem deleted forever.')
+    }, [poemStore, showToast])
+
+    const handleSoftDelete = useCallback(id => {
+        poemStore.softDeletePoem(id)
+        showToast('Poem hidden from display.')
     }, [poemStore, showToast])
 
     return (
@@ -176,6 +181,7 @@ function AppContent({ uid }) {
                                         getPoem={poemStore.getPoem}
                                         toggleReaction={poemStore.toggleReaction}
                                         deletePoem={handleDelete}
+                                        softDeletePoem={handleSoftDelete}
                                         onEdit={handleEditPoem}
                                         setActiveTag={poemStore.setActiveTag}
                                         getAdjacentPoems={poemStore.getAdjacentPoems}

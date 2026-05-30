@@ -5,6 +5,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import FocusMode from '../components/FocusMode'
 import VersionHistory from '../components/VersionHistory'
 import Comments from '../components/Comments'
+import { useAuth } from '../hooks/useAuth'
 
 const REACTION_TYPES = [
     { key: 'loved', icon: '❤️', label: 'Loved' },
@@ -35,10 +36,11 @@ function formatReadingTime(minutes) {
 }
 
 export default function PoemPage({
-    getPoem, toggleReaction, deletePoem, onEdit, setActiveTag,
+    getPoem, toggleReaction, deletePoem, softDeletePoem, onEdit, setActiveTag,
     getAdjacentPoems, restoreVersion, bookmarks, analytics, streak,
     addComment, getComments, deleteComment, readingTheme, setReadingTheme,
 }) {
+    const { user } = useAuth()
     const { id } = useParams()
     const navigate = useNavigate()
     const [confirmOpen, setConfirmOpen] = useState(false)
@@ -53,6 +55,7 @@ export default function PoemPage({
 
     const poem = getPoem(id)
     const adjacent = poem ? getAdjacentPoems(id) : { prev: null, next: null }
+    const isAuthor = user && poem && user.id === poem.user_id
 
     // Fetch comments from Firestore
     useEffect(() => {
@@ -129,6 +132,12 @@ export default function PoemPage({
 
     const handleDelete = () => {
         deletePoem(poem.id)
+        setConfirmOpen(false)
+        navigate('/')
+    }
+
+    const handleSoftDelete = () => {
+        softDeletePoem(poem.id)
         setConfirmOpen(false)
         navigate('/')
     }
@@ -383,7 +392,7 @@ export default function PoemPage({
                                 </svg>
                                 Focus
                             </button>
-                            {(poem.versions || []).length > 1 && (
+                            {isAuthor && (poem.versions || []).length > 1 && (
                                 <button className="btn-ghost-sm" onClick={() => setVersionHistoryOpen(true)}>
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="12" cy="12" r="10" />
@@ -392,8 +401,12 @@ export default function PoemPage({
                                     History ({poem.versions.length})
                                 </button>
                             )}
-                            <button className="btn-ghost-sm" onClick={() => onEdit(poem)}>Edit</button>
-                            <button className="btn-ghost-sm btn-danger" onClick={() => setConfirmOpen(true)}>Delete</button>
+                            {isAuthor && (
+                                <>
+                                    <button className="btn-ghost-sm" onClick={() => onEdit(poem)}>Edit</button>
+                                    <button className="btn-ghost-sm btn-danger" onClick={() => setConfirmOpen(true)}>Delete</button>
+                                </>
+                            )}
                         </div>
                     </footer>
 
@@ -426,6 +439,7 @@ export default function PoemPage({
             <ConfirmDialog
                 isOpen={confirmOpen}
                 onClose={() => setConfirmOpen(false)}
+                onSoftDelete={handleSoftDelete}
                 onConfirm={handleDelete}
             />
 
